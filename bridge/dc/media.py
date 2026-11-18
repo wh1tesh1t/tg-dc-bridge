@@ -57,8 +57,11 @@ class DiscordMedia:
     def gif_embed_url(embed) -> str | None:
         if embed.type == "gifv":
             return getattr(embed.video, "url", None)
-        if embed.type == "image" and embed.url and urlparse(embed.url).path.lower().endswith(".gif"):
-            return embed.url
+        if embed.type == "image":
+            image_url = getattr(getattr(embed, "image", None), "url", None)
+            for url in (image_url, embed.url):
+                if url and urlparse(url).path.lower().endswith(".gif"):
+                    return url
         return None
 
     @staticmethod
