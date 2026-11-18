@@ -41,6 +41,8 @@ class DiscordBridge(discord.Client):
         self._sync = sync
 
     async def on_ready(self) -> None:
+        activity = discord.Game(name=self._cfg.discord_status_text) if self._cfg.discord_status else None
+        await self.change_presence(activity=activity)
         logger.info("Discord client ready as {} (id={})", self.user, self.user.id)
         channel = self.get_channel(self._cfg.discord_channel_id)
         if channel and not channel.permissions_for(channel.guild.me).manage_messages:

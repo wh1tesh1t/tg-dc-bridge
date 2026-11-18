@@ -23,10 +23,23 @@ class HttpClient:
         if self._session and not self._session.closed:
             await self._session.close()
 
-    async def fetch(self, url: str) -> bytes | None:
+    async def fetch(self, url: str, max_bytes: int | None = None) -> bytes | None:
         try:
             async with self.session.get(url, timeout=self._timeout) as r:
                 if r.status == 200:
+                    if max_bytes is not None:
+                        if r.content_length and r.content_length > max_bytes:
+                            logger.warning("Fetch {} exceeds maximum size of {} bytes", url, max_bytes)
+                            return None
+                        chunks: list[bytes] = []
+                        size = 0
+                        async for chunk in r.content.iter_chunked(64 * 1024):
+                            size += len(chunk)
+                            if size > max_bytes:
+                                logger.warning("Fetch {} exceeds maximum size of {} bytes", url, max_bytes)
+                                return None
+                            chunks.append(chunk)
+                        return b"".join(chunks)
                     return await r.read()
                 logger.warning("Fetch {} -> HTTP {}", url, r.status)
         except Exception as e:

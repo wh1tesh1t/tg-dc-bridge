@@ -16,6 +16,8 @@ class Settings:
     discord_channel_id: int
     discord_guild_id: int
     discord_webhook_url: str
+    discord_status: bool
+    discord_status_text: str
     emoji_as_images: bool
     emoji_image_limit: int
     max_discord_file_mb: int
@@ -39,6 +41,8 @@ class Settings:
             discord_channel_id=config.DISCORD_CHANNEL_ID,
             discord_guild_id=config.DISCORD_GUILD_ID,
             discord_webhook_url=config.DISCORD_WEBHOOK_URL,
+            discord_status=getattr(config, "DISCORD_STATUS", True),
+            discord_status_text=getattr(config, "DISCORD_STATUS_TEXT", "github.com/Elinsrc/tg-dc-bridge"),
             emoji_as_images=config.EMOJI_AS_IMAGES,
             emoji_image_limit=config.EMOJI_IMAGE_LIMIT,
             max_discord_file_mb=config.MAX_DISCORD_FILE_MB,
